@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".movies.DetailMovieActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".movies.DetailMovieActivity">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/table">
+            <TableRow android:paddingEnd="10dp" android:paddingStart="0dp">
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="200dp"
+                    android:id="@+id/coverImage"
+                    android:layout_marginTop="8dp"
+                    android:padding="0dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"/>
+
+                <LinearLayout android:layout_marginTop="8dp" android:layout_width="wrap_content" android:orientation="vertical" android:layout_weight="3">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lbl_title"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.1"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:gravity="end"
+                            android:text="@string/title3"
+                            android:textColor="#ff000000"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_title"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingStart="8dp"
+                            android:singleLine="false"
+                            android:text="@string/textview"
+                            android:textColor="#ff000000"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lbl_director"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.1"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:gravity="end"
+                            android:text="@string/director"
+                            android:textColor="#ff000000"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_director"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingStart="8dp"
+                            android:singleLine="false"
+                            android:text="@string/textview"
+                            android:textColor="#ff000000"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lbl_category"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.1"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:gravity="end"
+                            android:text="Category :"
+                            android:textColor="#ff000000"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_category"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingStart="8dp"
+                            android:singleLine="false"
+                            android:text="@string/textview"
+                            android:textColor="#ff000000"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lbl_genre"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.1"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:gravity="end"
+                            android:text="@string/genre"
+                            android:textColor="#ff000000"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_genre"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingStart="8dp"
+                            android:singleLine="false"
+                            android:text="@string/textview"
+                            android:textColor="#ff000000"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lbl_year"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.1"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="14sp"
+                            android:gravity="end"
+                            android:text="@string/released"
+                            android:textColor="#ff000000"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_year"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:paddingStart="8dp"
+                            android:singleLine="false"
+                            android:text="@string/textview"
+                            android:textColor="#ff000000"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="12sp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </TableRow>
+        </TableLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingLeft="10dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#ff000000"
+            android:text="@string/film_synopsis"/>
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/synopsis"
+            android:justificationMode="inter_word"
+            android:textColor="#ff000000"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:textStyle="normal"/>
+    </LinearLayout>
+</ScrollView>

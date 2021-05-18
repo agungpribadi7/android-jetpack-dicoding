@@ -1,14 +1,24 @@
 package com.example.submission01
 
+import android.content.res.Resources
+import android.view.View
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.example.submission01.data.Data
+import com.example.submission01.data.source.local.Data
+import com.example.submission01.utils.EspressoIdlingResource
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.Rule
 
@@ -20,42 +30,94 @@ class MainActivityTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
+    @Before
+    fun setUp() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.espressoTestIdlingResource)
+    }
+
+    @After
+    fun tearDown() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.espressoTestIdlingResource)
+    }
+
     @Test
     fun loadMovies(){
         onView(withId(R.id.recycle_view_movies)).check(matches(isDisplayed()))
-
-        for(i in 0..9){
-            onView(withId(R.id.recycle_view_movies)).perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
-            onView(withId(R.id.tv_title)).check(matches(isDisplayed()))
-            onView(withId(R.id.tv_title)).check(matches(withText(dataMovies[i].title)))
-            onView(withId(R.id.tv_category)).check(matches(isDisplayed()))
-            onView(withId(R.id.tv_category)).check(matches(withText(dataMovies[i].rating)))
-            onView(withId(R.id.tv_director)).check(matches(isDisplayed()))
-            onView(withId(R.id.tv_director)).check(matches(withText(dataMovies[i].directors)))
-            onView(withId(R.id.synopsis)).check(matches(isDisplayed()))
-            onView(withId(R.id.synopsis)).check(matches(withText(dataMovies[i].description)))
-            onView(isRoot()).perform(ViewActions.pressBack());
-        }
+        val i = 0
+        onView(withId(R.id.recycle_view_movies)).perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
+        onView(withId(R.id.tv_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.tv_title)).check(matches(withText(dataMovies[i].title.toString())))
+        onView(withId(R.id.tv_category_movie)).check(matches(isDisplayed()))
+        customWithText(R.id.tv_category_movie)?.matches(dataMovies[i].rating)
+        onView(withId(R.id.tv_director)).check(matches(isDisplayed()))
+        onView(withId(R.id.tv_director)).check(matches(withText(dataMovies[i].directors)))
+        onView(withId(R.id.synopsis)).check(matches(isDisplayed()))
+        onView(withId(R.id.synopsis)).check(matches(withText(dataMovies[i].description)))
+        onView(isRoot()).perform(ViewActions.pressBack())
 
     }
 
     @Test
     fun loadSeries(){
         onView(withText("TV SERIES")).perform(click())
-        for(i in 0..9){
-            onView(withId(R.id.recycle_view_series)).check(matches(isDisplayed()))
-            onView(withId(R.id.recycle_view_series)).perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
-            onView(withId(R.id.tv_title)).check(matches(isDisplayed()))
-            onView(withId(R.id.tv_title)).check(matches(withText(dataSeries[i].title)))
-            onView(withId(R.id.tv_category)).check(matches(isDisplayed()))
-            onView(withId(R.id.tv_category)).check(matches(withText(dataSeries[i].rating)))
-            onView(withId(R.id.tv_director)).check(matches(isDisplayed()))
-            onView(withId(R.id.tv_director)).check(matches(withText(dataSeries[i].directors)))
-            onView(withId(R.id.synopsis)).check(matches(isDisplayed()))
-            onView(withId(R.id.synopsis)).check(matches(withText(dataSeries[i].description)))
-            onView(isRoot()).perform(ViewActions.pressBack());
-        }
+        val i = 0
+        onView(withId(R.id.recycle_view_series)).check(matches(isDisplayed()))
+        onView(withId(R.id.recycle_view_series)).perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
+        onView(withId(R.id.tv_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.tv_title)).check(matches(withText(dataSeries[i].title)))
+        onView(withId(R.id.tv_category)).check(matches(isDisplayed()))
+        customWithText(R.id.tv_category)?.matches(dataSeries[i].rating)
+        onView(withId(R.id.tv_director)).check(matches(isDisplayed()))
+        onView(withId(R.id.tv_director)).check(matches(withText(dataSeries[i].directors)))
+        onView(withId(R.id.synopsis)).check(matches(isDisplayed()))
+        onView(withId(R.id.synopsis)).check(matches(withText(dataSeries[i].description)))
+        onView(isRoot()).perform(ViewActions.pressBack())
 
+    }
+
+
+
+    fun customWithText(resourceId: Int): Matcher<View?>? {
+        return object : BoundedMatcher<View?, TextView>(TextView::class.java) {
+            private var resourceName: String? = null
+            private var expectedText: String? = null
+            override fun describeTo(description: Description) {
+                description.appendText("with string from resource id: ")
+                description.appendValue(resourceId)
+                if (null != resourceName) {
+                    description.appendText("[")
+                    description.appendText(resourceName)
+                    description.appendText("]")
+                }
+                if (null != expectedText) {
+                    description.appendText(" value: ")
+                    description.appendText(expectedText)
+                }
+            }
+
+            override fun matchesSafely(textView: TextView): Boolean {
+                if (null == expectedText) {
+                    try {
+                        expectedText = textView.resources.getString(
+                            resourceId
+                        )
+                        resourceName = textView.resources
+                            .getResourceEntryName(resourceId)
+                    } catch (ignored: Resources.NotFoundException) {
+                        /*
+                         * view could be from a context unaware of the resource
+                         * id.
+                         */
+                    }
+                }
+                return if (null != expectedText) {
+                    expectedText == textView.text
+                        .toString()
+                } else {
+                    false
+                }
+            }
+        }
     }
 
 }

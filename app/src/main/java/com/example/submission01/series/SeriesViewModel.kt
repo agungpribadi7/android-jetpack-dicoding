@@ -1,28 +1,35 @@
 package com.example.submission01.series
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.submission01.data.Data
-import com.example.submission01.data.DataClass
+import androidx.lifecycle.viewModelScope
+import com.example.submission01.data.source.ItemRepository
+import com.example.submission01.data.source.local.DataClass
+import kotlinx.coroutines.launch
 
-class SeriesViewModel : ViewModel() {
-    private lateinit var idData: String
+class SeriesViewModel(private val repository: ItemRepository) : ViewModel() {
+    private val _series = MutableLiveData<ArrayList<DataClass>>()
+    val series : LiveData<ArrayList<DataClass>> = _series
 
-    fun setIdData(id : String){
-        idData = id
-    }
+    private var _isLoading = MutableLiveData<Boolean>()
+    var isLoading : LiveData<Boolean> = _isLoading
 
-    fun getData(): MutableList<DataClass> {
-        return Data.getTvShows()
-    }
-
-    fun getDataById() : DataClass?{
-        val data = getData()
-        var result : DataClass? = null
-        for(item in data){
-            if(item.id == idData.toInt()){
-                result = item
-            }
+    fun getData() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val response = repository.getNTv(10)
+            _series.value = response
+            _isLoading.value = false
         }
-        return result
+    }
+
+    fun getDataById(id : Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val response = repository.getNTv(1, id)
+            _series.value = response
+            _isLoading.value = false
+        }
     }
 }

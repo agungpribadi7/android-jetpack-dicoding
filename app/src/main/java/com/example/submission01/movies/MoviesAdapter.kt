@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.submission01.R
-import com.example.submission01.data.DataClass
+import com.example.submission01.data.source.local.DataClass
 import com.example.submission01.databinding.ItemDataBinding
 
 

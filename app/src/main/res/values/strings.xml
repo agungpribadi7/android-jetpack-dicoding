@@ -20,4 +20,5 @@
     <string name="genre">Genre :</string>
     <string name="released">Released :</string>
     <string name="logo">logo</string>
+    <string name="rating">Rating :</string>
 </resources>

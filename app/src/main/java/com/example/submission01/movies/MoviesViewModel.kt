@@ -1,28 +1,38 @@
 package com.example.submission01.movies
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.submission01.data.Data
-import com.example.submission01.data.DataClass
+import androidx.lifecycle.viewModelScope
+import com.example.submission01.data.source.ItemRepository
+import com.example.submission01.data.source.local.DataClass
+import kotlinx.coroutines.launch
 
-class MoviesViewModel : ViewModel() {
-    private lateinit var idData: String
+class MoviesViewModel(val repository : ItemRepository) : ViewModel() {
+    private val _movies = MutableLiveData<ArrayList<DataClass>>()
+    val movies : LiveData<ArrayList<DataClass>> = _movies
 
-    fun setIdData(id : String){
-        idData = id
-    }
+    private var _isLoading = MutableLiveData<Boolean>()
+    val isLoading : LiveData<Boolean> = _isLoading
 
-    fun getData(): MutableList<DataClass> {
-        return Data.getMovies()
-    }
-
-    fun getDataById() : DataClass?{
-        val data = getData()
-        var result : DataClass? = null
-        for(item in data){
-            if(item.id == idData.toInt()){
-                result = item
-            }
+    fun getMovies() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val responseResult = repository.getNMovies(10)
+            _movies.value = responseResult
+            _isLoading.value = false
         }
-        return result
+
     }
+
+    fun getMoviesById(id: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val responseResult = repository.getNMovies(1, id)
+            _movies.value = responseResult
+            _isLoading.value = false
+        }
+    }
+
+
 }

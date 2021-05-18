@@ -5,11 +5,18 @@
     android:layout_height="match_parent"
     tools:context=".movies.MoviesFragment">
 
+    <ProgressBar
+        android:id="@+id/progressBarMovies"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/recycle_view_movies"/>
+        android:id="@+id/recycle_view_movies"
+        tools:listitem="@layout/item_data"/>
 
 
 </FrameLayout>

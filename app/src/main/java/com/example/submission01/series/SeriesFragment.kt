@@ -6,16 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.submission01.data.source.local.DataClass
+import com.example.submission01.data.source.local.entity.DataEntity
 import com.example.submission01.databinding.FragmentSeriesBinding
-import com.example.submission01.viewmodel.ViewModelFactory
-
+import com.example.submission01.vo.Status
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class SeriesFragment : Fragment(), SeriesAdapter.SeriesClickListener {
     private lateinit var binding : FragmentSeriesBinding
-    private lateinit var viewModel : SeriesViewModel
+    private val viewModel : SeriesViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,31 +29,31 @@ class SeriesFragment : Fragment(), SeriesAdapter.SeriesClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         if(activity != null){
-            val factory = ViewModelFactory.getInstance()
             val seriesAdapter = SeriesAdapter(this)
-            activity?.let {
-                viewModel = ViewModelProvider(it, factory)[SeriesViewModel::class.java]
-            }
-            viewModel.getData()
-            viewModel.isLoading.observe(viewLifecycleOwner, { value ->
-                if(value)
-                    binding.progressBarSeries.visibility = View.VISIBLE
-                else
-                    binding.progressBarSeries.visibility = View.GONE
-            })
-            viewModel.series.observe(viewLifecycleOwner, {listSeries ->
-                seriesAdapter.setData(listSeries)
 
-                with(binding.recycleViewSeries) {
-                    layoutManager = GridLayoutManager(context, 2)
-                    adapter = seriesAdapter
-                }
+            viewModel.getData().observe(viewLifecycleOwner, {listSeries ->
+                    when (listSeries.status) {
+                        Status.LOADING -> binding.progressBarSeries.visibility = View.VISIBLE
+                        Status.SUCCESS -> {
+                            binding.progressBarSeries.visibility = View.GONE
+                            listSeries.data?.let { seriesAdapter.submitList(it) }
+                            with(binding.recycleViewSeries) {
+                                layoutManager = GridLayoutManager(context, 2)
+                                adapter = seriesAdapter
+                            }
+                        }
+                        Status.ERROR -> {
+                            binding.progressBarSeries.visibility = View.GONE
+                            Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
             })
 
         }
     }
 
-    override fun onClick(data : DataClass) {
+    override fun onClick(data : DataEntity) {
         val intent = Intent(this.context,  DetailSeriesActivity::class.java)
         intent.putExtra(DetailSeriesActivity.EXTRA_DATA, data)
         startActivity(intent)

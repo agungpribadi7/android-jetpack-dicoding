@@ -41,4 +41,8 @@ ext {
     retrofitVersion = '2.9.0'
     mockitoVersion = '3.6.0'
     androidCoreTestVersion = '2.1.0'
+    roomVersion = '2.2.3'
+    roomRuntimeVersion = '2.3.0'
+    archLifecycleVersion = '2.2.0'
+    koinVersion = '2.1.6'
 }

@@ -1,65 +1,69 @@
 package com.example.submission01.data.source.remote
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.submission01.BuildConfig
 import com.example.submission01.data.DataMovieResponse
-import com.example.submission01.data.source.remote.api.ApiConfig
+import com.example.submission01.data.source.remote.api.ApiService
 import com.example.submission01.data.source.remote.response.DataTvResponse
 import com.example.submission01.utils.EspressoIdlingResource
 import retrofit2.*
+import java.lang.Exception
 
-class RemoteDataSource {
+class RemoteDataSource(private val apiService : ApiService) {
 
-    companion object {
-        @Volatile
-        private  var instance: RemoteDataSource? = null
-        fun getInstance(): RemoteDataSource =
-            instance ?: synchronized(this) {
-                instance ?: RemoteDataSource()
+    suspend fun getNMovies(n : Int, specificId : Int = -1) : LiveData<ApiResponse<List<DataMovieResponse>>> {
+        val resultResponse = MutableLiveData<ApiResponse<List<DataMovieResponse>>>()
+        val arrReturnValue : MutableList<DataMovieResponse> = ArrayList()
+        if(specificId == -1){
+            val startIndex = 120
+            val endIndex = 120 + n
+            for (id in startIndex until endIndex) {
+                EspressoIdlingResource.increment()
+                try {
+                    arrReturnValue.add(apiService.getNMovies(id.toString(), BuildConfig.API_KEY).await())
+                } catch (e : Exception) {
+                    Log.e("GET MOVIE", "Id tidak ada")
+                } finally {
+                    EspressoIdlingResource.decrement()
+                }
+
             }
+
+        } else {
+            EspressoIdlingResource.increment()
+            arrReturnValue.add(apiService.getNMovies(specificId.toString(), BuildConfig.API_KEY).await())
+            EspressoIdlingResource.decrement()
+        }
+        resultResponse.value = ApiResponse.success(arrReturnValue)
+        return resultResponse
     }
 
-    suspend fun getNMovies(n : Int, specificId : Int = -1, callback : LoadMovieApi) {
+    suspend fun getNSeries(n : Int, specificId : Int = -1) : LiveData<ApiResponse<List<DataTvResponse>>> {
+        val resultResponse = MutableLiveData<ApiResponse<List<DataTvResponse>>>()
+        val arrReturnValue : MutableList<DataTvResponse> = ArrayList()
         if(specificId == -1){
-            for (id in 120 until 120 + n) {
+            val startIndex = 120
+            val endIndex = 120 + n
+            for (id in startIndex until endIndex) {
                 EspressoIdlingResource.increment()
-                ApiConfig.getApiService().getNMovies(id.toString(), BuildConfig.API_KEY).await().let {
-                        singleMovie -> callback.responsesRetrieved(singleMovie)
+                try{
+                    arrReturnValue.add(apiService.getNTv(id.toString(), BuildConfig.API_KEY).await())
+                } catch (e : Exception) {
+                    Log.e("GET SERIES", "id tidak ditemukan")
+                } finally {
+                    EspressoIdlingResource.decrement()
                 }
-                EspressoIdlingResource.decrement()
+
             }
         } else {
             EspressoIdlingResource.increment()
-            ApiConfig.getApiService().getNMovies(specificId.toString(), BuildConfig.API_KEY).await().let {
-                    singleMovie -> callback.responsesRetrieved(singleMovie)
-            }
+            arrReturnValue.add(apiService.getNTv(specificId.toString(), BuildConfig.API_KEY).await())
             EspressoIdlingResource.decrement()
         }
-    }
-
-    suspend fun getNSeries(n : Int, specificId : Int = -1, callback: LoadSeriesApi) {
-        if(specificId == -1){
-            for (id in 121 until 121 + n) {
-                EspressoIdlingResource.increment()
-                ApiConfig.getApiService().getNTv(id.toString(), BuildConfig.API_KEY).await().let {
-                        singleTv -> callback.responsesRetrived(singleTv)
-                }
-                EspressoIdlingResource.decrement()
-            }
-        } else {
-            EspressoIdlingResource.increment()
-            ApiConfig.getApiService().getNTv(specificId.toString(), BuildConfig.API_KEY).await().let {
-                    singleTv -> callback.responsesRetrived(singleTv)
-            }
-            EspressoIdlingResource.decrement()
-        }
-    }
-
-    interface LoadMovieApi {
-        fun responsesRetrieved(movieResponse : DataMovieResponse)
-    }
-
-    interface LoadSeriesApi {
-        fun responsesRetrived(seriesResponse : DataTvResponse)
+        resultResponse.value = ApiResponse.success(arrReturnValue)
+        return resultResponse
     }
 
 }

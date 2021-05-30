@@ -1,35 +1,33 @@
 package com.example.submission01.series
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.paging.PagedList
 import com.example.submission01.data.source.ItemRepository
-import com.example.submission01.data.source.local.DataClass
+import com.example.submission01.data.source.local.entity.DataEntity
+import com.example.submission01.vo.Resource
+import com.example.submission01.vo.Status
 import kotlinx.coroutines.launch
 
 class SeriesViewModel(private val repository: ItemRepository) : ViewModel() {
-    private val _series = MutableLiveData<ArrayList<DataClass>>()
-    val series : LiveData<ArrayList<DataClass>> = _series
+    var sort = MutableLiveData<String>()
 
-    private var _isLoading = MutableLiveData<Boolean>()
-    var isLoading : LiveData<Boolean> = _isLoading
-
-    fun getData() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val response = repository.getNTv(10)
-            _series.value = response
-            _isLoading.value = false
-        }
+    fun getData(n : Int = 30) : LiveData<Resource<PagedList<DataEntity>>> {
+        return repository.getNTv(n)
     }
 
-    fun getDataById(id : Int) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val response = repository.getNTv(1, id)
-            _series.value = response
-            _isLoading.value = false
-        }
+    fun getDataById(id : Int): LiveData<Resource<PagedList<DataEntity>>>{
+        return repository.getNTv(1, id)
+    }
+
+    fun addFavorite(id : Int) : Resource<String> {
+        return repository.addFavoriteSeries(id)
+    }
+
+    fun deleteFavorite(id : Int) : Resource<String> {
+        return repository.deleteFavoriteSeries(id)
+    }
+
+    var getFavorite: LiveData<Resource<List<DataEntity>>> = Transformations.switchMap(sort) { value ->
+        repository.getFavoriteSeries(value)
     }
 }

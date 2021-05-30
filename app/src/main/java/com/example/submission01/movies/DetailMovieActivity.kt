@@ -3,16 +3,18 @@ package com.example.submission01.movies
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.submission01.R
-import com.example.submission01.data.source.local.DataClass
+import com.example.submission01.data.source.local.entity.DataEntity
 import com.example.submission01.databinding.ActivityDetailMovieBinding
-import com.example.submission01.viewmodel.ViewModelFactory
+import com.example.submission01.vo.Status
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class DetailMovieActivity : AppCompatActivity() {
     private lateinit var binding : ActivityDetailMovieBinding
+    private val dataViewModel :MoviesViewModel by viewModel()
     companion object{
         const val EXTRA_DATA = "extra_data"
     }
@@ -21,43 +23,60 @@ class DetailMovieActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailMovieBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.title = "Submission 2"
-
-        val factory = ViewModelFactory.getInstance()
-        val dataViewModel = ViewModelProvider(
-            this,
-            factory
-        )[MoviesViewModel::class.java]
+        supportActionBar?.title = "Submission 3"
 
         val extras = intent.extras
         if(extras != null){
-            val getExtra = intent.getParcelableExtra<DataClass>(EXTRA_DATA)
+            val getExtra = intent.getParcelableExtra<DataEntity>(EXTRA_DATA)
             val id = getExtra?.id
-            if (id != null) {
-                dataViewModel.getMoviesById(id)
-            }
             with(binding){
-                dataViewModel.movies.observe(this@DetailMovieActivity, { value ->
-                    Glide.with(applicationContext).load(value[0].image).apply(
-                        RequestOptions.placeholderOf(R.drawable.ic_animated_loading)
-                            .error(R.drawable.ic_broken)
-                    ).into(coverImage)
-                    tvCategoryMovie.text = value[0].rating
-                    tvDirector.text = value[0].directors
-                    tvGenre.text = value[0].genre
-                    tvTitle.text = value[0].title
-                    tvYear.text = value[0].releaseYear.toString()
-                    synopsis.text = value[0].description
-                })
+                if (id != null) {
+                    starMovies.setOnClickListener{
+                        if(starMovies.isChecked) {
+                            val result = dataViewModel.addFavorite(id)
+                            if(result.status == Status.SUCCESS) {
+                                Toast.makeText(this@DetailMovieActivity, "Added to favorites", Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(this@DetailMovieActivity, "Error!", Toast.LENGTH_LONG).show()
+                            }
+                        } else {
+                            val result = dataViewModel.deleteFavorite(id)
+                            if(result.status == Status.SUCCESS) {
+                                Toast.makeText(this@DetailMovieActivity, "Removed from favorites", Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(this@DetailMovieActivity, "Error!", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
 
-                dataViewModel.isLoading.observe(this@DetailMovieActivity, {value ->
-                    if(value)
-                        progressBarDetailMovies.visibility = View.VISIBLE
-                    else
-                        progressBarDetailMovies.visibility = View.GONE
-                })
+                    dataViewModel.getMoviesById(id).observe(this@DetailMovieActivity, { value ->
+                        if(value != null) {
+                            when(value.status) {
+                                Status.LOADING -> progressBarDetailMovies.visibility = View.VISIBLE
+                                Status.SUCCESS -> {
+                                    progressBarDetailMovies.visibility = View.GONE
+                                    starMovies.isChecked = value.data?.get(0)?.favorite == true
+                                    Glide.with(applicationContext).load(value.data?.get(0)?.image).apply(
+                                        RequestOptions.placeholderOf(R.drawable.ic_animated_loading)
+                                            .error(R.drawable.ic_broken)
+                                    ).into(coverImage)
+                                    tvCategoryMovie.text = value.data?.get(0)?.rating
+                                    tvDirector.text = value.data?.get(0)?.directors
+                                    tvGenre.text = value.data?.get(0)?.genre
+                                    tvTitle.text = value.data?.get(0)?.title
+                                    tvYear.text = value.data?.get(0)?.releaseYear.toString()
+                                    synopsis.text = value.data?.get(0)?.description
+                                }
+                                Status.ERROR -> {
+                                    binding.progressBarDetailMovies.visibility = View.GONE
+                                    Toast.makeText(applicationContext, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                                }
+                            }
 
+                        }
 
+                    })
+                }
             }
         }
 

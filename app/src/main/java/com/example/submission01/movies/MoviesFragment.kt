@@ -1,22 +1,21 @@
 package com.example.submission01.movies
 
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.VisibleForTesting
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.submission01.data.source.local.DataClass
+import com.example.submission01.data.source.local.entity.DataEntity
 import com.example.submission01.databinding.FragmentMoviesBinding
-import com.example.submission01.viewmodel.ViewModelFactory
+import com.example.submission01.vo.Status
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MoviesFragment : Fragment(), MoviesAdapter.MoviesClickListener {
     private lateinit var binding : FragmentMoviesBinding
-    private lateinit var viewModel : MoviesViewModel
+    private val viewModel : MoviesViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,29 +30,26 @@ class MoviesFragment : Fragment(), MoviesAdapter.MoviesClickListener {
 
 
         if(activity != null){
-            val factory = ViewModelFactory.getInstance()
-            activity?.let {
-                viewModel = ViewModelProvider(
-                    it,
-                    factory
-                )[MoviesViewModel::class.java]
-            }
-            viewModel.getMovies()
+
             val moviesAdapter = MoviesAdapter(this)
 
-            viewModel.isLoading.observe(viewLifecycleOwner, {value ->
-                if(value)
-                    binding.progressBarMovies.visibility = View.VISIBLE
-                else
-                    binding.progressBarMovies.visibility = View.GONE
-            })
+            viewModel.getMoviesViewModel().observe(viewLifecycleOwner, { listMoviesMap ->
+                    when(listMoviesMap.status) {
+                        Status.LOADING -> binding.progressBarMovies.visibility = View.VISIBLE
+                        Status.SUCCESS -> {
+                            binding.progressBarMovies.visibility = View.GONE
+                            listMoviesMap.data?.let { moviesAdapter.submitList(it) }
+                            with(binding.recycleViewMovies) {
+                                layoutManager = GridLayoutManager(context, 2)
+                                adapter = moviesAdapter
+                            }
+                        }
+                        Status.ERROR -> {
+                            binding.progressBarMovies.visibility = View.GONE
+                            Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                        }
+                    }
 
-            viewModel.movies.observe(viewLifecycleOwner, { listMoviesMap ->
-                moviesAdapter.setData(listMoviesMap)
-                with(binding.recycleViewMovies) {
-                    layoutManager = GridLayoutManager(context, 2)
-                    adapter = moviesAdapter
-                }
             })
 
 
@@ -61,7 +57,7 @@ class MoviesFragment : Fragment(), MoviesAdapter.MoviesClickListener {
         }
     }
 
-    override fun onClick(data : DataClass) {
+    override fun onClick(data : DataEntity) {
         val intent = Intent(this.context,  DetailMovieActivity::class.java)
         intent.putExtra(DetailMovieActivity.EXTRA_DATA, data)
         startActivity(intent)

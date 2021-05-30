@@ -1,37 +1,32 @@
 package com.example.submission01.movies
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.paging.PagedList
 import com.example.submission01.data.source.ItemRepository
-import com.example.submission01.data.source.local.DataClass
-import kotlinx.coroutines.launch
+import com.example.submission01.data.source.local.entity.DataEntity
+import com.example.submission01.vo.Resource
 
-class MoviesViewModel(val repository : ItemRepository) : ViewModel() {
-    private val _movies = MutableLiveData<ArrayList<DataClass>>()
-    val movies : LiveData<ArrayList<DataClass>> = _movies
+class MoviesViewModel(private val repository : ItemRepository) : ViewModel() {
+    val sort = MutableLiveData<String>()
 
-    private var _isLoading = MutableLiveData<Boolean>()
-    val isLoading : LiveData<Boolean> = _isLoading
-
-    fun getMovies() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val responseResult = repository.getNMovies(10)
-            _movies.value = responseResult
-            _isLoading.value = false
-        }
-
+    fun getMoviesViewModel(n : Int = 30) : LiveData<Resource<PagedList<DataEntity>>> {
+        return repository.getNMovies(n)
     }
 
-    fun getMoviesById(id: Int) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val responseResult = repository.getNMovies(1, id)
-            _movies.value = responseResult
-            _isLoading.value = false
-        }
+    fun getMoviesById(id : Int) : LiveData<Resource<PagedList<DataEntity>>> {
+        return repository.getNMovies(1, id)
+    }
+
+    fun addFavorite(id : Int) : Resource<String> {
+        return repository.addFavoriteMovie(id)
+    }
+
+    fun deleteFavorite(id : Int) : Resource<String> {
+        return repository.deleteFavoriteMovie(id)
+    }
+
+    val getFavorites : LiveData<Resource<List<DataEntity>>> = Transformations.switchMap(sort)  { value ->
+        repository.getFavoriteMovies(value)
     }
 
 

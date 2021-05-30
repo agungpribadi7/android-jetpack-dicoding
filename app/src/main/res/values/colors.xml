@@ -10,4 +10,6 @@
 
     <color name="grey">#564d4d</color>
     <color name="placeholder">#6FB6B6B6</color>
+    <color name="title">#80ced6</color>
+    <color name="sub">#d5f4e6</color>
 </resources>

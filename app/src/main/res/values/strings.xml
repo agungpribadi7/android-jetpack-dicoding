@@ -21,4 +21,8 @@
     <string name="released">Released :</string>
     <string name="logo">logo</string>
     <string name="rating">Rating :</string>
+    <string name="sort">Order by:</string>
+    <string name="favorite">Favorite</string>
+    <string name="recycleview">RecycleView</string>
+    <string name="no_data_image">no_data_image</string>
 </resources>

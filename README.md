@@ -1,5 +1,5 @@
 # android-jetpack-dicoding
-Submission (3 / 3) Pemanfaatan fitur unit testing dan instrumental testing. Video penggunaan aplikasi dapat dilihat pada https://youtu.be/sv9U-5QmuXs.
+Submission (3 / 3) Pemanfaatan fitur unit testing dan instrumental testing.
 
 Pada video diatas, pertama dijalankan aplikasi seperti biasa dengan menggunakan internet untuk mengambil data menggunakan Retrofit, kedua 
 aplikasi dijalankan kembali tanpa adanya internet, data tetap ada karena sudah disimpan ke dalam Room. Program menggunakan repository untuk 
